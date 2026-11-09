@@ -7,5 +7,11 @@
     "build": "astro build",
     "preview": "astro build && wrangler dev",
     "deploy": "astro build && wrangler deploy"
+  },
+  "dependencies": {
+    "astro": "^7.4.8"
+  },
+  "devDependencies": {
+    "wrangler": "^4.159.0"
   }
 }
