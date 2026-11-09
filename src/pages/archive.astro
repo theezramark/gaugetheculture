@@ -1,0 +1,100 @@
+---
+import Base from '../layouts/Base.astro';
+import Stamp from '../components/Stamp.astro';
+import Subscribe from '../components/Subscribe.astro';
+import { getIssues, issueUrl, formatDate } from '../lib/issues';
+
+const issues = await getIssues();
+// Group by year, newest first.
+const years = [...new Set(issues.map((i) => i.data.date.getUTCFullYear()))].sort((a, b) => b - a);
+---
+<Base title="Archive" description="Every issue of Gauge the Culture." active="Archive">
+  <section class="wrap head">
+    <p class="kicker">The archive</p>
+    <h1 class="hed head__title">Every issue</h1>
+    <p class="dek head__dek">
+      {issues.length} {issues.length === 1 ? 'essay' : 'essays'}, newest first. Each one is the full web version of the email.
+    </p>
+  </section>
+
+  {years.map((year) => {
+    const list = issues.filter((i) => i.data.date.getUTCFullYear() === year);
+    return (
+      <section class="wrap year" aria-labelledby={`y-${year}`}>
+        <div class="year__head">
+          <h2 id={`y-${year}`} class="hed">{year}</h2>
+          <p class="meta">{list.length} {list.length === 1 ? 'issue' : 'issues'}</p>
+        </div>
+
+        <ul class="covers">
+          {list.map((i) => (
+            <li>
+              <a href={issueUrl(i)}>
+                <Stamp issue={i} width={132} />
+                <p class="kicker covers__kicker">{i.data.topic}</p>
+                <h3 class="hed covers__title">{i.data.title}</h3>
+                <p class="meta">No. {i.data.number} · {formatDate(i.data.date)}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <table class="list">
+          <caption class="visually-hidden">{year} issues as a list</caption>
+          <thead>
+            <tr><th scope="col">Date</th><th scope="col">No.</th><th scope="col">Title</th><th scope="col">Topic</th><th scope="col">Read</th></tr>
+          </thead>
+          <tbody>
+            {list.map((i) => (
+              <tr>
+                <td class="meta">{formatDate(i.data.date)}</td>
+                <td class="meta">No. {i.data.number}</td>
+                <td><a class="hed" href={issueUrl(i)}>{i.data.title}</a></td>
+                <td class="kicker">{i.data.topic}</td>
+                <td class="meta">{i.data.readMinutes} min</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+    );
+  })}
+
+  <Subscribe />
+</Base>
+
+<style>
+  .head { padding-top: clamp(40px, 5vw, 72px); }
+  .head__title { font-size: clamp(56px, 7vw, 104px); line-height: 0.98; margin-top: 16px; }
+  .head__dek { font-size: clamp(19px, 1.6vw, 22px); margin-top: 18px; max-width: 600px; }
+
+  .year { padding-top: clamp(48px, 5vw, 72px); }
+  .year__head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    border-top: 2px solid var(--tx); padding-top: 14px; margin-bottom: 32px;
+  }
+  .year__head .hed { font-size: 44px; line-height: 1; }
+
+  .covers {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); gap: 48px 28px;
+  }
+  .covers a { display: flex; flex-direction: column; text-decoration: none; }
+  .covers__kicker { margin-top: 16px; font-size: 10.5px; }
+  .covers__title { font-size: 24px; line-height: 1.08; margin: 8px 0; }
+
+  .list { width: 100%; margin-top: 72px; border-collapse: collapse; }
+  .list th {
+    text-align: left; padding: 0 0 10px; font-family: var(--sans); font-weight: 600; font-size: 10.5px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--tx3);
+  }
+  .list td { padding: 18px 16px 18px 0; border-top: 1px solid var(--line); vertical-align: baseline; }
+  .list td a { font-size: 25px; line-height: 1.1; text-decoration: none; }
+  .list td.kicker { font-size: 10.5px; }
+
+  @media (max-width: 760px) {
+    .list th:nth-child(2), .list td:nth-child(2),
+    .list th:nth-child(4), .list td:nth-child(4),
+    .list th:nth-child(5), .list td:nth-child(5) { display: none; }
+  }
+</style>

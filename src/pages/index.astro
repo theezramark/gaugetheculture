@@ -1,0 +1,134 @@
+---
+import Base from '../layouts/Base.astro';
+import Stamp from '../components/Stamp.astro';
+import Subscribe from '../components/Subscribe.astro';
+import { getIssues, issueUrl, formatDate } from '../lib/issues';
+import { TOPICS } from '../content.config';
+
+const issues = await getIssues();
+const [lead, ...rest] = issues;
+const recent = rest.slice(0, 3);
+const more = rest.slice(3, 6);
+const topicCounts = TOPICS.map((t) => ({ topic: t, count: issues.filter((i) => i.data.topic === t).length }));
+---
+<Base active="Issues">
+  <div class="wrap">
+    <p class="strip">
+      <span>An opinionated newsletter on culture and change</span>
+      <span aria-hidden="true">·</span>
+      <span>Every other Sunday</span>
+      <span aria-hidden="true">·</span>
+      <a href="#subscribe">Subscribe free</a>
+    </p>
+  </div>
+
+  {lead && (
+    <section class="wrap lead" aria-labelledby="lead-title">
+      <div class="lead__text">
+        <p class="kicker">The latest · No. {lead.data.number} · {lead.data.topic}</p>
+        <h1 id="lead-title" class="hed lead__title"><a href={issueUrl(lead)}>{lead.data.title}</a></h1>
+        <p class="dek lead__dek">{lead.data.dek}</p>
+        <p class="meta lead__by">
+          <strong>By Gauge the Culture</strong> · {formatDate(lead.data.date)} · {lead.data.readMinutes} min read
+        </p>
+        <div class="lead__actions">
+          <a class="btn" href={issueUrl(lead)}>Read the essay</a>
+          <a class="btn btn--secondary" href="#subscribe">Get it by email</a>
+        </div>
+      </div>
+      <a class="lead__cover" href={issueUrl(lead)} tabindex="-1" aria-hidden="true">
+        <Stamp issue={lead} width={250} ratio="4 / 4.4" />
+      </a>
+    </section>
+  )}
+
+  {recent.length > 0 && (
+    <section class="wrap section" aria-labelledby="recent-title">
+      <div class="sec-head">
+        <h2 id="recent-title" class="kicker">Recent essays</h2>
+        <a class="textlink" href="/archive/">All issues</a>
+      </div>
+      <div class="grid3">
+        {recent.map((i) => (
+          <article>
+            <a class="card" href={issueUrl(i)}>
+              <Stamp issue={i} width={120} ratio="4 / 3" />
+              <p class="kicker card__kicker">{i.data.topic}</p>
+              <h3 class="hed card__title">{i.data.title}</h3>
+              <p class="dek card__dek">{i.data.dek}</p>
+              <p class="meta">No. {i.data.number} · {formatDate(i.data.date)} · {i.data.readMinutes} min</p>
+            </a>
+          </article>
+        ))}
+      </div>
+      {more.length > 0 && (
+        <div class="grid3 more">
+          {more.map((i) => (
+            <a class="more__item" href={issueUrl(i)}>
+              <p class="kicker">{i.data.topic}</p>
+              <h3 class="hed more__title">{i.data.title}</h3>
+              <p class="meta">No. {i.data.number} · {formatDate(i.data.date)}</p>
+            </a>
+          ))}
+        </div>
+      )}
+    </section>
+  )}
+
+  <section class="wrap section" aria-labelledby="topics-title">
+    <div class="sec-head">
+      <h2 id="topics-title" class="kicker">Browse by topic</h2>
+      <a class="textlink" href="/archive/">Open the archive</a>
+    </div>
+    <ul class="topics">
+      {topicCounts.map(({ topic, count }) => (
+        <li>
+          <a href="/archive/">
+            <span class="hed">{topic}</span>
+            <span class="meta">{count} {count === 1 ? 'issue' : 'issues'}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <Subscribe />
+</Base>
+
+<style>
+  .strip {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin: 0;
+    padding: 14px 0; border-bottom: 1px solid var(--line);
+    font-family: var(--sans); font-size: 13.5px; color: var(--tx2);
+  }
+  .strip a { color: var(--acc); font-weight: 600; text-underline-offset: 4px; }
+
+  .lead {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr));
+    gap: 48px clamp(40px, 6vw, 96px); align-items: center; padding-top: clamp(40px, 5vw, 72px);
+  }
+  .lead__title { font-size: clamp(54px, 6.6vw, 96px); line-height: 0.98; margin-top: 20px; }
+  .lead__title a { text-decoration: none; }
+  .lead__dek { font-size: clamp(20px, 1.8vw, 24px); margin-top: 24px; max-width: 560px; }
+  .lead__by { margin-top: 26px; }
+  .lead__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 48px 40px; }
+  .card { display: flex; flex-direction: column; text-decoration: none; }
+  .card__kicker { margin-top: 20px; }
+  .card__title { font-size: clamp(28px, 2.4vw, 34px); line-height: 1.06; margin-top: 10px; }
+  .card__dek { font-size: 17.5px; margin: 10px 0 14px; }
+  .more { margin-top: 56px; row-gap: 0; }
+  .more__item { display: block; padding: 22px 0; border-top: 1px solid var(--line); text-decoration: none; }
+  .more__title { font-size: 26px; line-height: 1.08; margin: 8px 0 10px; }
+
+  .topics {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); column-gap: 48px;
+  }
+  .topics a {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+    padding: 22px 0; border-top: 1px solid var(--line); text-decoration: none;
+  }
+  .topics .hed { font-size: 32px; line-height: 1.05; }
+</style>

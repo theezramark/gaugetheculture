@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import Subscribe from '../components/Subscribe.astro';
+---
+<Base title="About" active="About">
+  <section class="wrap about">
+    <p class="kicker">About</p>
+    <h1 class="hed about__title">Culture, read closely.</h1>
+    <div class="prose about__body">
+      <!-- SAMPLE COPY: replace with your own words. -->
+      <p>Gauge the Culture is an opinionated newsletter about television, film, books, music and the world, and what they say about how we live now.</p>
+      <p>One long essay arrives every other Sunday. Every issue also lives here, in full, for free.</p>
+    </div>
+  </section>
+  <Subscribe />
+</Base>
+
+<style>
+  .about { padding-top: clamp(40px, 5vw, 72px); text-align: center; }
+  .about__title { font-size: clamp(52px, 6vw, 88px); line-height: 1; margin-top: 16px; }
+  .about__body { text-align: left; margin-top: 32px; }
+</style>

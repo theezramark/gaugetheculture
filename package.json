@@ -1,0 +1,11 @@
+{
+  "name": "gaugetheculture",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro build && wrangler dev",
+    "deploy": "astro build && wrangler deploy"
+  }
+}

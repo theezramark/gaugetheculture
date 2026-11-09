@@ -1,0 +1,7 @@
+# Dependabot opens a pull request when a package we use gets a security fix.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"

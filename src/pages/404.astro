@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Page not found">
+  <section class="wrap nf">
+    <p class="kicker">Error 404</p>
+    <h1 class="hed nf__title">This page isn’t here.</h1>
+    <p class="dek">It may have moved. Every issue is in the archive.</p>
+    <p><a class="btn" href="/archive/">Open the archive</a></p>
+  </section>
+</Base>
+
+<style>
+  .nf { padding-block: clamp(64px, 10vw, 140px); text-align: center; }
+  .nf__title { font-size: clamp(48px, 6vw, 80px); margin: 16px 0 18px; }
+  .nf .btn { margin-top: 20px; }
+</style>
