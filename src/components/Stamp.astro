@@ -1,0 +1,17 @@
+---
+// An issue's perforated stamp cover, on a flat panel.
+import type { Issue } from '../lib/issues';
+import { pad, STAMP_NUMBER_COLOR } from '../lib/issues';
+
+interface Props { issue: Issue; width?: number; ratio?: string }
+const { issue, width = 150, ratio = '4 / 5' } = Astro.props;
+const { number, topic, cover } = issue.data;
+---
+<div class="cover" style={`aspect-ratio:${ratio}`}>
+  {cover && (
+    <div class="stamp" style={`width:min(${width}px, 70%)`}>
+      <img src={cover} alt={`Stamp cover for issue ${number}`} width="400" height="500" loading="lazy" />
+      <span class="stamp__num" style={`color:${STAMP_NUMBER_COLOR[topic]}`} aria-hidden="true">{pad(number)}</span>
+    </div>
+  )}
+</div>

@@ -1,0 +1,10 @@
+// Cloudflare Workers settings. The site is fully static:
+// `astro build` writes HTML to ./dist and Cloudflare serves those files.
+{
+  "name": "gaugetheculture",
+  "compatibility_date": "2026-11-09",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

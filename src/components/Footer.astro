@@ -1,0 +1,57 @@
+---
+import Wordmark from './Wordmark.astro';
+const year = new Date().getFullYear();
+---
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="footer__logo">
+          <img src="/mark.svg" alt="" width="48" height="48" />
+          <Wordmark size={34} />
+        </div>
+        <p class="dek">An opinionated newsletter on culture and change.</p>
+      </div>
+      <div class="footer__cols">
+        <div>
+          <p class="kicker footer__label">Read</p>
+          <a href="/">Latest issue</a>
+          <a href="/archive/">Archive</a>
+          <a href="/about/">About</a>
+        </div>
+        <div>
+          <p class="kicker footer__label">Follow</p>
+          <!-- TODO: add your real profile links -->
+          <a href="#">YouTube</a>
+          <a href="#">Instagram</a>
+          <a href="#">X</a>
+          <a href="#">Threads</a>
+          <a href="#">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© {year} Gauge the Culture</span>
+      <span>Privacy · Terms · RSS</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { padding-block: clamp(48px, 6vw, 72px) 32px; }
+  .footer__top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px; }
+  .footer__brand { display: flex; flex-direction: column; gap: 16px; max-width: 340px; }
+  .footer__brand .dek { font-size: 17px; }
+  .footer__logo { display: flex; align-items: center; gap: 12px; }
+  .footer__cols { display: flex; flex-wrap: wrap; gap: clamp(40px, 6vw, 96px); }
+  .footer__cols a {
+    display: block; margin-top: 12px; font-family: var(--sans); font-size: 14px;
+    color: var(--tx2); text-decoration: none;
+  }
+  .footer__label { color: var(--tx); font-size: 11px; }
+  .footer__bottom {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px;
+    margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--line);
+    font-family: var(--sans); font-size: 13px; color: var(--tx3);
+  }
+</style>

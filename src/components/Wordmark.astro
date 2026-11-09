@@ -1,0 +1,23 @@
+---
+// The logo word mark: "Gauge" (blackletter), "the" (brush), "CULTURE" (Cinzel). Do not restyle.
+interface Props { size?: number }
+const { size = 23 } = Astro.props;
+---
+<span class="wm" style={`--g:${size}px`} aria-hidden="true">
+  <span class="wm__top"><span class="wm__gauge">Gauge</span><span class="wm__the">the</span></span>
+  <span class="wm__culture">CULTURE</span>
+</span>
+
+<style>
+  .wm { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1; }
+  .wm__top { display: flex; align-items: baseline; gap: calc(var(--g) * 0.116); }
+  .wm__gauge { font-family: 'UnifrakturCook', serif; font-weight: 700; font-size: var(--g); color: var(--wm-1); }
+  .wm__the {
+    font-family: 'Caveat Brush', cursive; font-size: calc(var(--g) * 0.505); color: var(--wm-2);
+    display: inline-block; transform: rotate(-6deg);
+  }
+  .wm__culture {
+    font-family: 'Cinzel', serif; font-weight: 600; font-size: calc(var(--g) * 0.337);
+    letter-spacing: 0.5em; margin-top: calc(var(--g) * 0.095); color: var(--wm-3);
+  }
+</style>

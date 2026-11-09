@@ -1,0 +1,99 @@
+---
+// One page per issue: /issues/<file-name>/
+import Base from '../../layouts/Base.astro';
+import Subscribe from '../../components/Subscribe.astro';
+import { render } from 'astro:content';
+import { getIssues, issueUrl, formatDate, type Issue } from '../../lib/issues';
+
+export async function getStaticPaths() {
+  const issues = await getIssues();
+  return issues.map((issue) => ({ params: { slug: issue.id }, props: { issue } }));
+}
+
+interface Props { issue: Issue }
+const { issue } = Astro.props;
+const { Content } = await render(issue);
+const d = issue.data;
+const others = (await getIssues()).filter((i) => i.id !== issue.id).slice(0, 3);
+---
+<Base title={d.title} description={d.dek} active="Issues">
+  <article>
+    <header class="wrap ihead">
+      <p class="ihead__row">
+        <a href="/archive/">← All issues</a>
+        <span class="ihead__bar" aria-hidden="true"></span>
+        <span class="kicker">No. {d.number} · {d.topic}</span>
+      </p>
+      <h1 class="hed ihead__title">{d.title}</h1>
+      <p class="dek ihead__dek">{d.dek}</p>
+      <p class="meta ihead__by">
+        <img src="/mark.svg" alt="" width="36" height="36" />
+        <span><strong>By Gauge the Culture</strong> · <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date)}</time> · {d.readMinutes} min read</span>
+      </p>
+      <hr class="ihead__rule" />
+    </header>
+
+    <div class="wrap">
+      <div class="prose prose--essay">
+        <Content />
+      </div>
+
+      <aside class="reply" aria-label="Reply">
+        <div>
+          <h2 class="hed reply__title">Did this one land? Argue back.</h2>
+          <p class="dek reply__text">Reply to the email or send your take. The best replies are quoted in the next issue.</p>
+        </div>
+        <a class="btn" href="mailto:hello@gaugetheculture.com">Send a reply</a>
+      </aside>
+    </div>
+  </article>
+
+  {others.length > 0 && (
+    <section class="wrap section" aria-labelledby="more-title">
+      <div class="sec-head">
+        <h2 id="more-title" class="kicker">Keep reading</h2>
+        <a class="textlink" href="/archive/">All issues</a>
+      </div>
+      <ul class="keep">
+        {others.map((i) => (
+          <li>
+            <a href={issueUrl(i)}>
+              <p class="kicker">{i.data.topic}</p>
+              <h3 class="hed keep__title">{i.data.title}</h3>
+              <p class="meta">No. {i.data.number} · {formatDate(i.data.date)}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <Subscribe />
+</Base>
+
+<style>
+  /* Everything in the header sits on the same center line as the text column. */
+  .ihead { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: clamp(36px, 4.6vw, 64px); }
+  .ihead__row { display: flex; align-items: center; gap: 14px; margin: 0; }
+  .ihead__row a { font-family: var(--sans); font-weight: 500; font-size: 13.5px; color: var(--tx2); text-decoration: none; }
+  .ihead__bar { width: 1px; height: 14px; background: var(--line2); }
+  .ihead__title { font-size: clamp(52px, 6.6vw, 96px); line-height: 0.98; margin-top: 26px; max-width: 960px; }
+  .ihead__dek { font-size: clamp(20px, 1.9vw, 25px); line-height: 1.42; margin-top: 22px; max-width: 620px; }
+  .ihead__by { display: flex; align-items: center; gap: 12px; margin-top: 28px; }
+  .ihead__rule { width: 100%; max-width: var(--measure); margin: 48px 0 6px; border: 0; border-top: 1px solid var(--line); }
+
+  .reply {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px;
+    max-width: var(--measure); margin: 56px auto 0; padding: 28px 0;
+    border-block: 1px solid var(--line);
+  }
+  .reply__title { font-size: 30px; line-height: 1.1; }
+  .reply__text { font-size: 17px; margin-top: 8px; max-width: 420px; }
+
+  .keep {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 0 40px;
+  }
+  .keep a { display: block; padding: 22px 0; border-top: 1px solid var(--line); text-decoration: none; }
+  .keep__title { font-size: 28px; line-height: 1.08; margin: 8px 0 10px; }
+</style>
