@@ -1,0 +1,16 @@
+# Installed packages and build output (re-created by npm install / npm run build)
+node_modules/
+dist/
+.astro/
+.wrangler/
+
+# Secrets: never commit these. API keys live in Cloudflare secrets, not in git.
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+
+# System files
+.DS_Store
+Thumbs.db
+npm-debug.log*
