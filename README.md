@@ -64,11 +64,10 @@ Secrets (Worker > Settings > Variables and Secrets, type **Secret**):
 |---|---|
 | `RESEND_SEND_KEY` | Resend key, **Sending access**, limited to gaugetheculture.com |
 | `RESEND_CONTACTS_KEY` | Resend key that can add contacts (Full access). Used only after a confirmed click |
-| `RESEND_SEGMENT_ID` | ID of the Resend segment for subscribers |
 | `TURNSTILE_SECRET` | Turnstile widget secret key |
 | `SIGNING_KEY` | Long random string. Make one with `openssl rand -base64 48` |
 
-Build variable (Worker > Settings > Build > Variables): `PUBLIC_TURNSTILE_SITE_KEY` = the Turnstile **site** key (public).
+Not secret, so kept in code: the Resend segment ID (`wrangler.jsonc` > `vars`) and the Turnstile **site** key (`src/components/Subscribe.astro`).
 
 Local test: copy `.dev.vars.example` to `.dev.vars`, fill it in, run `npm run preview`.
 

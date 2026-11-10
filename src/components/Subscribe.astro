@@ -1,8 +1,9 @@
 ---
 // Signup band. Posts to /api/subscribe (worker/index.ts): Turnstile bot check, then a confirm email.
-// The Turnstile site key is public. It comes from the build variable PUBLIC_TURNSTILE_SITE_KEY.
-// Without it (local dev), Cloudflare's official test key is used, which always passes.
-const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA';
+// The Turnstile SITE key is public (every visitor's browser receives it), so it lives here in the code.
+// The SECRET key is never in code: it is the TURNSTILE_SECRET secret in Cloudflare.
+// In local dev, Cloudflare's official test key is used, which always passes.
+const siteKey = import.meta.env.DEV ? '1x00000000000000000000AA' : '0x4AAAAAAF7XoexwEX-7sPM9';
 ---
 <section id="subscribe" class="band" aria-labelledby="subscribe-title">
   <div class="wrap band__inner">
