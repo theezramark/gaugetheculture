@@ -105,9 +105,14 @@ async function checkTurnstile(token: string, request: Request, env: Env): Promis
       remoteip: request.headers.get('CF-Connecting-IP') ?? undefined,
     }),
   });
-  if (!res.ok) return { ok: false, reason: `siteverify http ${res.status}` };
-  const data = (await res.json()) as { success?: boolean; hostname?: string; action?: string; 'error-codes'?: string[] };
-  if (data.success !== true) return { ok: false, reason: `failed [${(data['error-codes'] ?? []).join(', ')}]` };
+  // Siteverify always answers in JSON, even on errors, so read the error codes before giving up.
+  let data: { success?: boolean; hostname?: string; action?: string; 'error-codes'?: string[] } = {};
+  try {
+    data = await res.json();
+  } catch {
+    return { ok: false, reason: `siteverify http ${res.status}, no JSON body` };
+  }
+  if (data.success !== true) return { ok: false, reason: `http ${res.status} [${(data['error-codes'] ?? []).join(', ')}]` };
   if (!ALLOWED_HOSTS.includes(data.hostname ?? '')) return { ok: false, reason: `wrong hostname ${data.hostname}` };
   if (data.action !== 'subscribe') return { ok: false, reason: `wrong action ${data.action}` };
   return { ok: true, reason: '' };
