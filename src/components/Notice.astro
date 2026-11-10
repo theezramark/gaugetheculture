@@ -1,0 +1,21 @@
+---
+// Simple one-message page, used after signup steps.
+import Base from '../layouts/Base.astro';
+interface Props { title: string; kicker: string; text: string; linkHref?: string; linkLabel?: string }
+const { title, kicker, text, linkHref = '/', linkLabel = 'Back to the latest issue' } = Astro.props;
+---
+<Base title={title}>
+  <section class="wrap notice">
+    <p class="kicker">{kicker}</p>
+    <h1 class="hed notice__title">{title}</h1>
+    <p class="dek notice__text">{text}</p>
+    <p><a class="btn" href={linkHref}>{linkLabel}</a></p>
+  </section>
+</Base>
+
+<style>
+  .notice { padding-block: clamp(64px, 10vw, 140px); text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .notice__title { font-size: clamp(44px, 5.6vw, 76px); margin: 16px 0 18px; }
+  .notice__text { font-size: 20px; max-width: 520px; }
+  .notice .btn { margin-top: 24px; }
+</style>
