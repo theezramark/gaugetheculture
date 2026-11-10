@@ -70,7 +70,7 @@ async function subscribe(request: Request, env: Env): Promise<Response> {
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${env.RESEND_SEND_KEY}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: `Bearer ${(env.RESEND_SEND_KEY ?? '').trim()}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       from: FROM,
       to: [email],
@@ -97,7 +97,8 @@ function reject(reason: string): Response {
 async function checkTurnstile(token: string, request: Request, env: Env): Promise<{ ok: boolean; reason: string }> {
   if (!token) return { ok: false, reason: 'no token (widget not finished or blocked)' };
   if (token.length > 2048) return { ok: false, reason: 'token too long' };
-  const body = new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: token });
+  // .trim() removes a space or line break that can sneak in when a key is pasted.
+  const body = new URLSearchParams({ secret: (env.TURNSTILE_SECRET ?? '').trim(), response: token });
   const ip = request.headers.get('CF-Connecting-IP');
   if (ip) body.set('remoteip', ip);
   let res: Response;
@@ -161,7 +162,7 @@ async function confirm(request: Request, env: Env): Promise<Response> {
 
   const res = await fetch('https://api.resend.com/contacts', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${env.RESEND_CONTACTS_KEY}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: `Bearer ${(env.RESEND_CONTACTS_KEY ?? '').trim()}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       email: payload.e,
       unsubscribed: false,
