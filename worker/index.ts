@@ -19,7 +19,8 @@ interface Env {
 
 const SITE = 'https://gaugetheculture.com';
 const FROM = 'Gauge the Culture <hello@gaugetheculture.com>';
-const ALLOWED_HOSTS = ['gaugetheculture.com', 'www.gaugetheculture.com', 'localhost'];
+// Live site only. Cloudflare's guide says production must not accept localhost.
+const ALLOWED_HOSTS = ['gaugetheculture.com', 'www.gaugetheculture.com'];
 const LINK_LIFETIME_SECONDS = 48 * 60 * 60; // confirm links work for 48 hours
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -96,15 +97,20 @@ function reject(reason: string): Response {
 async function checkTurnstile(token: string, request: Request, env: Env): Promise<{ ok: boolean; reason: string }> {
   if (!token) return { ok: false, reason: 'no token (widget not finished or blocked)' };
   if (token.length > 2048) return { ok: false, reason: 'token too long' };
-  const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      secret: env.TURNSTILE_SECRET,
-      response: token,
-      remoteip: request.headers.get('CF-Connecting-IP') ?? undefined,
-    }),
-  });
+  const body = new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: token });
+  const ip = request.headers.get('CF-Connecting-IP');
+  if (ip) body.set('remoteip', ip);
+  let res: Response;
+  try {
+    // Form-encoded, with a 10-second limit, as Cloudflare's integration guide specifies.
+    res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body,
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch {
+    return { ok: false, reason: 'siteverify unreachable or timed out' };
+  }
   // Siteverify always answers in JSON, even on errors, so read the error codes before giving up.
   let data: { success?: boolean; hostname?: string; action?: string; 'error-codes'?: string[] } = {};
   try {
