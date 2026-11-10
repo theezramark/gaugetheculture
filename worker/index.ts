@@ -51,7 +51,7 @@ export default {
 async function subscribe(request: Request, env: Env): Promise<Response> {
   // Only accept form posts that come from our own pages.
   const origin = request.headers.get('Origin');
-  if (origin && !ALLOWED_HOSTS.includes(new URL(origin).hostname)) return redirect('/subscribe-error/');
+  if (origin && !ALLOWED_HOSTS.includes(new URL(origin).hostname)) return reject('bad-origin');
 
   const form = await request.formData();
 
@@ -59,10 +59,10 @@ async function subscribe(request: Request, env: Env): Promise<Response> {
   if (String(form.get('website') ?? '') !== '') return redirect('/check-your-email/');
 
   const email = String(form.get('email') ?? '').trim().toLowerCase();
-  if (!isValidEmail(email)) return redirect('/subscribe-error/');
+  if (!isValidEmail(email)) return reject('invalid-email');
 
   const human = await checkTurnstile(String(form.get('cf-turnstile-response') ?? ''), request, env);
-  if (!human) return redirect('/subscribe-error/');
+  if (!human.ok) return reject(`turnstile: ${human.reason}`);
 
   const token = await sign({ e: email, x: Math.floor(Date.now() / 1000) + LINK_LIFETIME_SECONDS }, env.SIGNING_KEY);
   const link = `${SITE}/api/confirm?t=${encodeURIComponent(token)}`;
@@ -86,8 +86,16 @@ async function subscribe(request: Request, env: Env): Promise<Response> {
   return redirect('/check-your-email/');
 }
 
-async function checkTurnstile(token: string, request: Request, env: Env): Promise<boolean> {
-  if (!token || token.length > 2048) return false;
+// Logs WHY a signup was rejected (never the email itself), then sends the reader to the error page.
+// Read these in Cloudflare: Workers & Pages > gaugetheculture > Logs.
+function reject(reason: string): Response {
+  console.warn('subscribe rejected:', reason);
+  return redirect('/subscribe-error/');
+}
+
+async function checkTurnstile(token: string, request: Request, env: Env): Promise<{ ok: boolean; reason: string }> {
+  if (!token) return { ok: false, reason: 'no token (widget not finished or blocked)' };
+  if (token.length > 2048) return { ok: false, reason: 'token too long' };
   const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -97,9 +105,12 @@ async function checkTurnstile(token: string, request: Request, env: Env): Promis
       remoteip: request.headers.get('CF-Connecting-IP') ?? undefined,
     }),
   });
-  if (!res.ok) return false;
-  const data = (await res.json()) as { success?: boolean; hostname?: string; action?: string };
-  return data.success === true && ALLOWED_HOSTS.includes(data.hostname ?? '') && data.action === 'subscribe';
+  if (!res.ok) return { ok: false, reason: `siteverify http ${res.status}` };
+  const data = (await res.json()) as { success?: boolean; hostname?: string; action?: string; 'error-codes'?: string[] };
+  if (data.success !== true) return { ok: false, reason: `failed [${(data['error-codes'] ?? []).join(', ')}]` };
+  if (!ALLOWED_HOSTS.includes(data.hostname ?? '')) return { ok: false, reason: `wrong hostname ${data.hostname}` };
+  if (data.action !== 'subscribe') return { ok: false, reason: `wrong action ${data.action}` };
+  return { ok: true, reason: '' };
 }
 
 // ---------------------------------------------------------------- 2. confirm page (GET)
