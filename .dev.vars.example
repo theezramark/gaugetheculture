@@ -1,0 +1,7 @@
+# Copy this file to .dev.vars for local testing with `npm run preview`.
+# .dev.vars is in .gitignore. Never commit real keys. Never put real keys in this example file.
+# The Turnstile values below are Cloudflare's official TEST keys (they always pass).
+TURNSTILE_SECRET=1x0000000000000000000000000000000AA
+SIGNING_KEY=replace-with-a-long-random-string
+RESEND_SEND_KEY=
+RESEND_CONTACTS_KEY=

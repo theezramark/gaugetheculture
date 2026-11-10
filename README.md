@@ -10,7 +10,8 @@ Every issue is one Markdown file. The same file becomes the web page and, later,
 | Pages | Astro (turns Markdown into HTML) | `src/` |
 | Issues | Markdown files | `src/content/issues/` |
 | Hosting | Cloudflare Workers (static files) | `wrangler.jsonc` |
-| Sending email | Resend (not wired up yet) | Step 4 |
+| Signup form | Small Worker server (Turnstile + double opt-in) | `worker/index.ts` |
+| Sending email | Resend | API keys stored as Cloudflare secrets |
 
 ```
 src/
@@ -51,9 +52,28 @@ Cloudflare builds and deploys every push to `main`:
 - **Dependabot** (`.github/dependabot.yml`) opens a pull request when a package has a security fix. Review and merge those.
 - **Collect only what you need:** subscriber email, nothing else.
 
+## Signup form (double opt-in)
+
+1. The reader submits the form. `worker/index.ts` checks the email, a hidden bot trap and Cloudflare Turnstile.
+2. Resend emails them a signed link (works 48 hours). Nothing is saved yet.
+3. They open the link and press **Confirm**. Only then is the contact added to Resend.
+
+Secrets (Worker > Settings > Variables and Secrets, type **Secret**):
+
+| Name | What it is |
+|---|---|
+| `RESEND_SEND_KEY` | Resend key, **Sending access**, limited to gaugetheculture.com |
+| `RESEND_CONTACTS_KEY` | Resend key that can add contacts (Full access). Used only after a confirmed click |
+| `TURNSTILE_SECRET` | Turnstile widget secret key |
+| `SIGNING_KEY` | Long random string. Make one with `openssl rand -base64 48` |
+
+Not secret, so kept in code: the Resend segment ID (`wrangler.jsonc` > `vars`) and the Turnstile **site** key (`src/components/Subscribe.astro`).
+
+Local test: copy `.dev.vars.example` to `.dev.vars`, fill it in, run `npm run preview`.
+
 ## Not done yet
 
-- Signup form backend (`/api/subscribe`) with Turnstile and double opt-in
+- Rate limiting rule on `/api/subscribe` (Cloudflare WAF)
 - Email template (600 px, same Markdown) and sending through Resend
 - RSS feed, social preview image, mobile menu
 - Self-hosting the fonts (right now they load from Google Fonts)

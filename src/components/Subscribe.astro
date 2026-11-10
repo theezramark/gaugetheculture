@@ -1,6 +1,9 @@
 ---
-// Signup band. The form is not connected yet: Step 4 adds a Cloudflare Worker at /api/subscribe
-// with Turnstile (bot check) and double opt-in. Until then the button does nothing.
+// Signup band. Posts to /api/subscribe (worker/index.ts): Turnstile bot check, then a confirm email.
+// The Turnstile SITE key is public (every visitor's browser receives it), so it lives here in the code.
+// The SECRET key is never in code: it is the TURNSTILE_SECRET secret in Cloudflare.
+// In local dev, Cloudflare's official test key is used, which always passes.
+const siteKey = import.meta.env.DEV ? '1x00000000000000000000AA' : '0x4AAAAAAF7XoexwEX-7sPM9';
 ---
 <section id="subscribe" class="band" aria-labelledby="subscribe-title">
   <div class="wrap band__inner">
@@ -8,14 +11,23 @@
     <p class="kicker">The newsletter</p>
     <h2 id="subscribe-title" class="hed band__title">One essay, every other Sunday.</h2>
     <p class="dek band__text">Long opinions on television, film, books, music and the world, sent to your inbox. Every issue also lives here.</p>
-    <form class="signup" method="post" action="/api/subscribe">
-      <label class="visually-hidden" for="signup-email">Email address</label>
-      <input id="signup-email" name="email" type="email" autocomplete="email" required placeholder="Your email address" />
-      <button type="submit">Subscribe</button>
+    <form class="signup-form" method="post" action="/api/subscribe">
+      <div class="signup">
+        <label class="visually-hidden" for="signup-email">Email address</label>
+        <input id="signup-email" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="Your email address" />
+        <button type="submit">Subscribe</button>
+      </div>
+      <!-- Honeypot: hidden from people, bots fill it in. -->
+      <div class="hp" aria-hidden="true">
+        <label for="signup-website">Leave this empty</label>
+        <input id="signup-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <div class="cf-turnstile" data-sitekey={siteKey} data-action="subscribe" data-theme="auto" data-size="flexible"></div>
     </form>
-    <p class="meta">Free. We only store your email. Unsubscribe any time.</p>
+    <p class="meta">Free. We only store your email. You'll get one email to confirm. Unsubscribe any time.</p>
   </div>
 </section>
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <style>
   .band { margin-top: clamp(72px, 9vw, 128px); background: var(--surf2); border-block: 1px solid var(--line); }
@@ -26,5 +38,7 @@
   .band__inner .kicker { margin-top: 8px; }
   .band__title { font-size: clamp(40px, 4.6vw, 60px); line-height: 1.04; }
   .band__text { font-size: 19px; max-width: 520px; }
-  .signup { margin-top: 14px; }
+  .signup-form { width: 100%; max-width: 520px; margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+  .cf-turnstile { min-height: 65px; }
+  .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 </style>

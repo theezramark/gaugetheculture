@@ -1,10 +1,25 @@
-// Cloudflare Workers settings. The site is fully static:
-// `astro build` writes HTML to ./dist and Cloudflare serves those files.
+// Cloudflare Workers settings.
+// Static pages come from ./dist (built by `astro build`).
+// Only /api/* runs the small server in worker/index.ts (the signup form).
+//
+// Secrets are NOT in this file. Add them in the dashboard
+// (Worker > Settings > Variables and Secrets, type "Secret"):
+//   RESEND_SEND_KEY, RESEND_CONTACTS_KEY, TURNSTILE_SECRET, SIGNING_KEY
+// Plain values that are not secret live in "vars" below, so deploys never wipe them.
 {
   "name": "gaugetheculture",
   "compatibility_date": "2026-11-09",
+  "main": "./worker/index.ts",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "404-page"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"]
+  },
+  "vars": {
+    "RESEND_SEGMENT_ID": "2f6ddb95-d3a2-4ede-a8c5-8f1c4fc42e98"
+  },
+  "observability": {
+    "enabled": true
   }
 }
