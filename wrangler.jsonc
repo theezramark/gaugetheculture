@@ -19,6 +19,12 @@
   "vars": {
     "RESEND_SEGMENT_ID": "2f6ddb95-d3a2-4ede-a8c5-8f1c4fc42e98"
   },
+  // Preview builds (non-main branches) must not touch the real subscriber list.
+  "previews": {
+    "vars": {
+      "RESEND_SEGMENT_ID": "preview-not-a-real-segment"
+    }
+  },
   "observability": {
     "enabled": true
   }
