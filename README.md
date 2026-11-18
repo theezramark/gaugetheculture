@@ -51,6 +51,7 @@ Cloudflare builds and deploys every push to `main`:
 - **Security headers** live in `public/_headers`. The Content Security Policy only allows scripts from this site, which blocks most injected-script attacks.
 - **Dependabot** (`.github/dependabot.yml`) opens a pull request when a package has a security fix. Review and merge those.
 - **Collect only what you need:** subscriber email, nothing else.
+- **Fonts are self-hosted** through Astro's Fonts feature (`astro.config.mjs`). They download once at build time, so visitors never contact Google (GDPR).
 
 ## Signup form (double opt-in)
 
@@ -76,5 +77,4 @@ Local test: copy `.dev.vars.example` to `.dev.vars`, fill it in, run `npm run pr
 - Rate limiting rule on `/api/subscribe` (Cloudflare WAF)
 - Email template (600 px, same Markdown) and sending through Resend
 - RSS feed, social preview image, mobile menu
-- Self-hosting the fonts (right now they load from Google Fonts)
 - Replace sample copy (marked `SAMPLE COPY`) and add social links in the footer
