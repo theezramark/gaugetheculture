@@ -45,6 +45,12 @@ Cloudflare builds and deploys every push to `main`:
 - Build command: `npx astro build`
 - Deploy command: `npx wrangler deploy`
 
+## Privacy rules
+
+- Read `CLAUDE.md`: any new service that touches personal data means updating `src/pages/privacy.astro`.
+- The Impressum (`src/pages/impressum.astro`) keeps placeholders until the address is decided.
+- Cloudflare request logs are off (`invocation_logs: false`); only our own logs, which never contain emails, are kept.
+
 ## Security rules
 
 - **Never commit secrets.** API keys go in Cloudflare (`npx wrangler secret put NAME`), never in files. `.gitignore` already blocks `.env` and `.dev.vars`.
