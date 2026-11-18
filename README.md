@@ -39,6 +39,18 @@ npm run dev                       # open http://localhost:4321
 3. Add the stamp cover as `public/covers/17.svg`.
 4. Set `draft: true` while you're still writing. Drafts are never published.
 
+## Send an issue by email
+
+1. Merge the issue to `main` (it goes live on the site).
+2. On your computer: `git pull`, then `npm run build`.
+3. Run `npm run broadcast -- 16-the-horse-in-the-mirror` (the issue's file name without `.md`).
+4. Type `yes`, then paste a Resend **Full access** key when asked. Input is hidden and not saved.
+5. The script creates a **draft**. Nothing is sent.
+6. In Resend > Broadcasts: open the draft, **send yourself a test**, check it in Gmail (light and dark), then press **Send**.
+7. After sending: export the subscriber list (CSV) and store it outside Resend.
+
+Rules: open and click tracking stay **off** in Resend (Domains > gaugetheculture.com > Configuration). The email keeps the unsubscribe link; the script refuses to create a draft without it.
+
 ## Deploy
 
 Cloudflare builds and deploys every push to `main`:
