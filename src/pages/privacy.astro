@@ -5,10 +5,10 @@
 import Base from '../layouts/Base.astro';
 const updated = 'November 18, 2026';
 ---
-<Base title="Privacy" description="How Gauge the Culture handles your data.">
+<Base title="Privacy" description="How Gauge the Culture handles your data." signup={false}>
   <article class="wrap legal">
-    <p class="kicker">Privacy</p>
-    <h1 class="hed legal__title">Privacy policy</h1>
+    <p class="label">Privacy</p>
+    <h1 class="hed h1">Privacy policy</h1>
     <p class="meta">Last updated {updated}</p>
 
     <div class="draft" role="note">
@@ -67,17 +67,3 @@ const updated = 'November 18, 2026';
   </article>
 </Base>
 
-<style>
-  .legal { padding-top: clamp(40px, 5vw, 72px); }
-  .legal__title { font-size: clamp(48px, 6vw, 80px); margin: 16px 0 12px; }
-  .legal__body { margin-inline: 0; }
-  .legal__body h2 { font-size: clamp(26px, 2.4vw, 32px); margin-top: 48px; }
-  .legal__body p, .legal__body li { font-size: 18px; }
-  .legal__body ul { padding-left: 22px; margin: 16px 0 0; }
-  .legal__body li { font-family: var(--read); line-height: 1.6; color: var(--tx); margin-top: 8px; }
-  .legal__body mark { background: var(--sel); color: var(--tx); padding: 0 4px; }
-  .draft {
-    max-width: var(--measure); margin-top: 28px; padding: 14px 18px;
-    border: 1px solid var(--acc); font-family: var(--sans); font-size: 14px; color: var(--tx2);
-  }
-</style>

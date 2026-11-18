@@ -1,21 +1,24 @@
 ---
-// Signup band. Posts to /api/subscribe (worker/index.ts): Turnstile bot check, then a confirm email.
+// Signup. Posts to /api/subscribe (worker/index.ts): Turnstile bot check, then a confirm email.
 // The Turnstile SITE key is public (every visitor's browser receives it), so it lives here in the code.
 // The SECRET key is never in code: it is the TURNSTILE_SECRET secret in Cloudflare.
 // In local dev, Cloudflare's official test key is used, which always passes.
+// LEGAL: the words a reader sees here are recorded as FORM_TEXT_VERSION in worker/index.ts and
+// in legal/consent-versions.md. If you change the consent wording, add a new version there.
 const siteKey = import.meta.env.DEV ? '1x00000000000000000000AA' : '0x4AAAAAAF7XoexwEX-7sPM9';
 ---
-<section id="subscribe" class="band" aria-labelledby="subscribe-title">
-  <div class="wrap band__inner">
-    <img src="/stamp.svg" alt="" width="70" height="75" />
-    <p class="kicker">The newsletter</p>
-    <h2 id="subscribe-title" class="hed band__title">One essay, every other Sunday.</h2>
-    <p class="dek band__text">Long opinions on television, film, books, music and the world, sent to your inbox. Every issue also lives here.</p>
-    <form class="signup-form" method="post" action="/api/subscribe">
-      <div class="signup">
-        <label class="visually-hidden" for="signup-email">Email address</label>
-        <input id="signup-email" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="Your email address" />
-        <button type="submit" data-signup-submit disabled>Subscribe</button>
+<div id="subscribe" class="grid closing__close" aria-labelledby="subscribe-title" role="region">
+  <div class="closing__copy">
+    <img class="stamp-mark" src="/stamp.svg" alt="" width="64" height="69" />
+    <h2 id="subscribe-title" class="hed h2">Get the Sunday essay by email.</h2>
+    <p class="lead sec-intro">One long opinion piece every other Sunday on television, film, books, music and the world. Free, and every issue also lives on this site.</p>
+  </div>
+  <div class="closing__form">
+    <form class="form signup-form" method="post" action="/api/subscribe">
+      <label class="field__label" for="signup-email">Email address</label>
+      <div class="field__row">
+        <input class="field__input" id="signup-email" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com" />
+        <button class="btn" type="submit" data-signup-submit disabled>Subscribe free</button>
       </div>
       <!-- Honeypot: hidden from people, bots fill it in. -->
       <div class="hp" aria-hidden="true">
@@ -24,26 +27,10 @@ const siteKey = import.meta.env.DEV ? '1x00000000000000000000AA' : '0x4AAAAAAF7X
       </div>
       <div class="cf-turnstile" data-sitekey={siteKey} data-action="subscribe" data-theme="auto" data-size="flexible"
         data-callback="gtcTurnstileOk" data-expired-callback="gtcTurnstileReset" data-error-callback="gtcTurnstileReset"></div>
-      <p class="meta signup-hint" data-signup-hint>Subscribe unlocks after the quick check above finishes.</p>
+      <p class="meta" data-signup-hint>The Subscribe button works once the quick check above finishes.</p>
     </form>
-    <p class="meta">Free. We only store your email. You'll get one email to confirm. Unsubscribe any time. Details in our <a href="/privacy/">privacy policy</a>.</p>
+    <p class="meta form__note">Free. We only store your email. You'll get one email to confirm. Unsubscribe any time. Details in our <a href="/privacy/">privacy policy</a>.</p>
   </div>
-</section>
+</div>
 <script is:inline src="/signup.js"></script>
 <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
-<style>
-  .band { margin-top: clamp(72px, 9vw, 128px); background: var(--surf2); border-block: 1px solid var(--line); }
-  .band__inner {
-    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px;
-    padding-block: clamp(48px, 6vw, 88px);
-  }
-  .band__inner .kicker { margin-top: 8px; }
-  .band__title { font-size: clamp(40px, 4.6vw, 60px); line-height: 1.04; }
-  .band__text { font-size: 19px; max-width: 520px; }
-  .signup-form { width: 100%; max-width: 520px; margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
-  .cf-turnstile { min-height: 65px; }
-  .signup button[disabled] { opacity: 0.5; cursor: not-allowed; }
-  .signup-hint { margin: 0; }
-  .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
-</style>

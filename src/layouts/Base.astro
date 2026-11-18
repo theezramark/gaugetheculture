@@ -1,26 +1,28 @@
 ---
-// The frame every page shares: <head>, nav, footer.
+// The frame every page shares: <head>, nav, the closing block (signup + footer).
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { Font } from 'astro:assets';
 
-interface Props { title?: string; description?: string; active?: string }
+interface Props { title?: string; description?: string; active?: string; signup?: boolean }
 const {
   title,
-  description = 'An opinionated newsletter on culture and change.',
+  description = 'One long opinion essay on culture every other Sunday: television, film, books, music and the world. Free by email.',
   active = '',
+  signup = true,
 } = Astro.props;
-const fullTitle = title ? `${title} | Gauge the Culture` : 'Gauge the Culture';
+const fullTitle = title ? `${title} | Gauge the Culture` : 'Gauge the Culture: a culture newsletter for close readers';
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!doctype html>
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#150e2e" />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
@@ -28,6 +30,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
     <!-- Self-hosted fonts (see astro.config.mjs). Preload only the two used above the fold. -->
     <Font cssVariable="--font-serif" preload />
     <Font cssVariable="--font-read" preload />
@@ -36,13 +39,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <Font cssVariable="--font-brush" />
     <Font cssVariable="--font-cinzel" />
     <script is:inline src="/theme.js"></script>
+    <script is:inline src="/site.js" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <Nav active={active} />
+    <Nav active={active} subscribeHref={signup ? "#subscribe" : "/#subscribe"} />
     <main id="main">
       <slot />
     </main>
-    <Footer />
+    <Footer signup={signup} />
   </body>
 </html>

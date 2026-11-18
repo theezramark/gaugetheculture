@@ -25,7 +25,7 @@ interface D1Like {
 
 // Proof of consent (GDPR Art. 7(1)). When the wording of the form or the confirm email changes,
 // bump the version here AND record the exact new text in legal/consent-versions.md.
-const FORM_TEXT_VERSION = 'form-2026-11-18';
+const FORM_TEXT_VERSION = 'form-2026-11-18b';
 const CONFIRM_EMAIL_VERSION = 'confirm-email-2026-11-18';
 
 const SITE = 'https://gaugetheculture.com';
