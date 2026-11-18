@@ -1,0 +1,23 @@
+---
+// Impressum (§ 18 MStV). BLOCKED until the address decision is made. Do not invent an address.
+import Base from '../layouts/Base.astro';
+---
+<Base title="Impressum" description="Legal notice for Gauge the Culture.">
+  <article class="wrap legal">
+    <p class="kicker">Legal notice</p>
+    <h1 class="hed legal__title">Impressum</h1>
+    <div class="prose legal__body">
+      <p><strong>Angaben gemäß § 18 MStV</strong></p>
+      <p><mark>[NAME]</mark><br /><mark>[STREET AND NUMBER]</mark><br /><mark>[POSTCODE AND CITY]</mark><br />Germany</p>
+      <p>Contact: <a href="mailto:hello@gaugetheculture.com">hello@gaugetheculture.com</a></p>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .legal { padding-top: clamp(40px, 5vw, 72px); }
+  .legal__title { font-size: clamp(48px, 6vw, 80px); margin: 16px 0 12px; }
+  .legal__body { margin-inline: 0; }
+  .legal__body p { font-size: 18px; }
+  .legal__body mark { background: var(--sel); color: var(--tx); padding: 0 4px; }
+</style>

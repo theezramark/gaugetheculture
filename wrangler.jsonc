@@ -26,6 +26,11 @@
     }
   },
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "logs": {
+      // Data minimization (GDPR): request logs held visitors' IP, city and all headers.
+      // Our own console logs (no emails, no IPs) still appear.
+      "invocation_logs": false
+    }
   }
 }
