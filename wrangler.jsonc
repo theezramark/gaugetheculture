@@ -16,6 +16,14 @@
     "not_found_handling": "404-page",
     "run_worker_first": ["/api/*"]
   },
+  // Proof-of-consent database (EU jurisdiction). The ID is not a secret: it only names the database.
+  "d1_databases": [
+    {
+      "binding": "CONSENT_DB",
+      "database_name": "gtc-consent",
+      "database_id": "24a5c2a9-08f1-4d05-91c6-bfc21df3fef4"
+    }
+  ],
   "vars": {
     "RESEND_SEGMENT_ID": "2f6ddb95-d3a2-4ede-a8c5-8f1c4fc42e98"
   },

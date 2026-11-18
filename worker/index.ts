@@ -15,7 +15,18 @@ interface Env {
   RESEND_SEGMENT_ID: string; // the Resend segment new subscribers join
   TURNSTILE_SECRET: string; // Turnstile secret key
   SIGNING_KEY: string; // long random string that signs confirm links
+  CONSENT_DB: D1Like; // Cloudflare D1 database (EU jurisdiction) holding proof of consent
 }
+
+// Minimal shape of the D1 binding we use (avoids a types package).
+interface D1Like {
+  prepare(query: string): { bind(...values: unknown[]): { run(): Promise<unknown> } };
+}
+
+// Proof of consent (GDPR Art. 7(1)). When the wording of the form or the confirm email changes,
+// bump the version here AND record the exact new text in legal/consent-versions.md.
+const FORM_TEXT_VERSION = 'form-2026-11-18';
+const CONFIRM_EMAIL_VERSION = 'confirm-email-2026-11-18';
 
 const SITE = 'https://gaugetheculture.com';
 const FROM = 'Gauge the Culture <hello@gaugetheculture.com>';
@@ -65,7 +76,11 @@ async function subscribe(request: Request, env: Env): Promise<Response> {
   const human = await checkTurnstile(String(form.get('cf-turnstile-response') ?? ''), request, env);
   if (!human.ok) return reject(`turnstile: ${human.reason}`);
 
-  const token = await sign({ e: email, x: Math.floor(Date.now() / 1000) + LINK_LIFETIME_SECONDS }, env.SIGNING_KEY);
+  const now = Math.floor(Date.now() / 1000);
+  const token = await sign(
+    { e: email, x: now + LINK_LIFETIME_SECONDS, s: now, fv: FORM_TEXT_VERSION, ev: CONFIRM_EMAIL_VERSION },
+    env.SIGNING_KEY,
+  );
   const link = `${SITE}/api/confirm?t=${encodeURIComponent(token)}`;
 
   const res = await fetch('https://api.resend.com/emails', {
@@ -160,6 +175,14 @@ async function confirm(request: Request, env: Env): Promise<Response> {
   const payload = await verify(String(form.get('t') ?? ''), env.SIGNING_KEY);
   if (!payload) return redirect('/confirm-failed/');
 
+  // 1. Store proof of consent first. If this fails, we do not subscribe the person.
+  await env.CONSENT_DB.prepare(
+    'INSERT INTO consents (email, signed_up_at, confirmed_at, form_text_version, confirm_email_version) VALUES (?, ?, ?, ?, ?)',
+  )
+    .bind(payload.e, new Date(payload.s * 1000).toISOString(), new Date().toISOString(), payload.fv, payload.ev)
+    .run();
+
+  // 2. Add the contact to the Resend segment.
   const res = await fetch('https://api.resend.com/contacts', {
     method: 'POST',
     headers: { Authorization: `Bearer ${(env.RESEND_CONTACTS_KEY ?? '').trim()}`, 'Content-Type': 'application/json' },
@@ -207,13 +230,15 @@ async function hmacKey(secret: string): Promise<CryptoKey> {
   return crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
 }
 
-async function sign(payload: { e: string; x: number }, secret: string): Promise<string> {
+interface TokenPayload { e: string; x: number; s: number; fv: string; ev: string }
+
+async function sign(payload: TokenPayload, secret: string): Promise<string> {
   const body = toB64url(enc.encode(JSON.stringify(payload)));
   const sig = new Uint8Array(await crypto.subtle.sign('HMAC', await hmacKey(secret), enc.encode(body)));
   return `${body}.${toB64url(sig)}`;
 }
 
-async function verify(token: string, secret: string): Promise<{ e: string; x: number } | null> {
+async function verify(token: string, secret: string): Promise<TokenPayload | null> {
   if (!token || token.length > 1000) return null;
   const [body, sig] = token.split('.');
   if (!body || !sig) return null;
@@ -223,8 +248,9 @@ async function verify(token: string, secret: string): Promise<{ e: string; x: nu
     if (!ok) return null;
     const p = JSON.parse(new TextDecoder().decode(fromB64url(body)));
     if (typeof p.e !== 'string' || !isValidEmail(p.e) || typeof p.x !== 'number') return null;
+    if (typeof p.s !== 'number' || typeof p.fv !== 'string' || typeof p.ev !== 'string') return null;
     if (p.x < Date.now() / 1000) return null; // expired
-    return { e: p.e, x: p.x };
+    return { e: p.e, x: p.x, s: p.s, fv: p.fv, ev: p.ev };
   } catch {
     return null;
   }
