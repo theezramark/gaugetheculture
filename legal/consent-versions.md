@@ -6,6 +6,13 @@ Never edit an old version. When wording changes, add a new section and bump the 
 
 ---
 
+## form-2026-11-18b (signup form, `src/components/Subscribe.astro`, site redesign)
+
+> **Get the Sunday essay by email.**
+> One long opinion piece every other Sunday on television, film, books, music and the world. Free, and every issue also lives on this site.
+> Email address: [you@example.com] [Subscribe free]
+> Free. We only store your email. You'll get one email to confirm. Unsubscribe any time. Details in our privacy policy (link to /privacy/).
+
 ## form-2026-11-18 (signup form, `src/components/Subscribe.astro`)
 
 > **One essay, every other Sunday.**

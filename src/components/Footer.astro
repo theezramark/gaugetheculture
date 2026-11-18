@@ -1,59 +1,45 @@
 ---
+// The closing block on every page: row 1 the signup (or a short line), row 2 the directory and legal row.
 import Wordmark from './Wordmark.astro';
+import Subscribe from './Subscribe.astro';
+
+interface Props { signup?: boolean }
+const { signup = true } = Astro.props;
 const year = new Date().getFullYear();
 ---
-<footer class="footer">
+<footer class="closing">
   <div class="wrap">
-    <div class="footer__top">
-      <div class="footer__brand">
-        <div class="footer__logo">
-          <img src="/mark.svg" alt="" width="48" height="48" />
-          <Wordmark size={34} />
+    {signup ? <Subscribe /> : null}
+
+    <div class={signup ? 'closing__dir' : ''}>
+      <div class="grid">
+        <div class="dir__brand">
+          <a class="dir__logo" href="/" aria-label="Gauge the Culture, home">
+            <img src="/mark.svg" alt="" width="44" height="44" />
+            <Wordmark size={30} />
+          </a>
+          <p class="dek">One long opinion essay on culture, every other Sunday.</p>
         </div>
-        <p class="dek">An opinionated newsletter on culture and change.</p>
-      </div>
-      <div class="footer__cols">
-        <div>
-          <p class="kicker footer__label">Read</p>
+        <div class="dir__col">
+          <h3>Read</h3>
           <a href="/">Latest issue</a>
           <a href="/archive/">Archive</a>
           <a href="/about/">About</a>
         </div>
-        <div>
-          <p class="kicker footer__label">Follow</p>
-          <!-- TODO: add your real profile links -->
-          <a href="#">YouTube</a>
-          <a href="#">Instagram</a>
-          <a href="#">X</a>
-          <a href="#">Threads</a>
-          <a href="#">LinkedIn</a>
+        <div class="dir__col">
+          <h3>Contact</h3>
+          <a href="mailto:hello@gaugetheculture.com">Email us</a>
+        </div>
+        <div class="dir__col">
+          <h3>Legal</h3>
+          <a href="/privacy/">Privacy</a>
+          <a href="/impressum/">Impressum</a>
         </div>
       </div>
-    </div>
-    <div class="footer__bottom">
-      <span>© {year} Gauge the Culture</span>
-      <span class="footer__legal"><a href="/privacy/">Privacy</a> · <a href="/impressum/">Impressum</a></span>
+      <div class="dir__legal">
+        <span>© {year} Gauge the Culture</span>
+        <span>No ads, no tracking.</span>
+      </div>
     </div>
   </div>
 </footer>
-
-<style>
-  .footer { padding-block: clamp(48px, 6vw, 72px) 32px; }
-  .footer__top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px; }
-  .footer__brand { display: flex; flex-direction: column; gap: 16px; max-width: 340px; }
-  .footer__brand .dek { font-size: 17px; }
-  .footer__logo { display: flex; align-items: center; gap: 12px; }
-  .footer__cols { display: flex; flex-wrap: wrap; gap: clamp(40px, 6vw, 96px); }
-  .footer__cols a {
-    display: block; margin-top: 12px; font-family: var(--sans); font-size: 14px;
-    color: var(--tx2); text-decoration: none;
-  }
-  .footer__label { color: var(--tx); font-size: 11px; }
-  .footer__legal a { color: inherit; text-decoration: none; }
-  .footer__legal a:hover { text-decoration: underline; }
-  .footer__bottom {
-    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px;
-    margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--line);
-    font-family: var(--sans); font-size: 13px; color: var(--tx3);
-  }
-</style>
