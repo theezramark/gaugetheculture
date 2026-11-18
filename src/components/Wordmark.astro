@@ -11,13 +11,13 @@ const { size = 23 } = Astro.props;
 <style>
   .wm { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1; }
   .wm__top { display: flex; align-items: baseline; gap: calc(var(--g) * 0.116); }
-  .wm__gauge { font-family: 'UnifrakturCook', serif; font-weight: 700; font-size: var(--g); color: var(--wm-1); }
+  .wm__gauge { font-family: var(--font-blackletter); font-weight: 700; font-size: var(--g); color: var(--wm-1); }
   .wm__the {
-    font-family: 'Caveat Brush', cursive; font-size: calc(var(--g) * 0.505); color: var(--wm-2);
+    font-family: var(--font-brush); font-size: calc(var(--g) * 0.505); color: var(--wm-2);
     display: inline-block; transform: rotate(-6deg);
   }
   .wm__culture {
-    font-family: 'Cinzel', serif; font-weight: 600; font-size: calc(var(--g) * 0.337);
+    font-family: var(--font-cinzel); font-weight: 600; font-size: calc(var(--g) * 0.337);
     letter-spacing: 0.5em; margin-top: calc(var(--g) * 0.095); color: var(--wm-3);
   }
 </style>

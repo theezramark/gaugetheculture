@@ -45,10 +45,11 @@
 }
 
 :root {
-  --serif: 'Instrument Serif', 'Times New Roman', serif;
-  --read: 'Newsreader', Georgia, serif;
-  --sans: 'Libre Franklin', 'Franklin Gothic Medium', Arial, sans-serif;
-  --blackletter: 'UnifrakturCook', 'Pirata One', serif;
+  /* The --font-* variables come from Astro's Fonts feature (astro.config.mjs). */
+  --serif: var(--font-serif);
+  --read: var(--font-read);
+  --sans: var(--font-sans);
+  --blackletter: var(--font-blackletter);
   --orange: #ff8a3d;
   --gutter: clamp(20px, 4vw, 48px);
   --max: 1240px;

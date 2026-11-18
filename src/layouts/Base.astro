@@ -3,6 +3,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import { Font } from 'astro:assets';
 
 interface Props { title?: string; description?: string; active?: string }
 const {
@@ -12,11 +13,6 @@ const {
 } = Astro.props;
 const fullTitle = title ? `${title} | Gauge the Culture` : 'Gauge the Culture';
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const fonts =
-  'https://fonts.googleapis.com/css2?family=Instrument+Serif' +
-  '&family=Newsreader:opsz,wght@6..72,400;6..72,500' +
-  '&family=Libre+Franklin:wght@400;500;600;700' +
-  '&family=UnifrakturCook:wght@700&family=Caveat+Brush&family=Cinzel:wght@600&display=swap';
 ---
 <!doctype html>
 <html lang="en" data-theme="dark">
@@ -32,9 +28,13 @@ const fonts =
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href={fonts} />
+    <!-- Self-hosted fonts (see astro.config.mjs). Preload only the two used above the fold. -->
+    <Font cssVariable="--font-serif" preload />
+    <Font cssVariable="--font-read" preload />
+    <Font cssVariable="--font-sans" />
+    <Font cssVariable="--font-blackletter" />
+    <Font cssVariable="--font-brush" />
+    <Font cssVariable="--font-cinzel" />
     <script is:inline src="/theme.js"></script>
   </head>
   <body>
