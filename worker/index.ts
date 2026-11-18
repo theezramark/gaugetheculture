@@ -47,6 +47,13 @@ export default {
     const url = new URL(request.url);
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
 
+    // Fail loudly if a secret or binding is missing (they live in the Cloudflare dashboard, not in code).
+    const missing = missingConfig(env);
+    if (missing.length) {
+      console.error('missing secret or binding:', missing.join(', '));
+      return redirect('/oops/');
+    }
+
     try {
       if (url.pathname === '/api/subscribe' && request.method === 'POST') return await subscribe(request, env);
       if (url.pathname === '/api/confirm' && request.method === 'GET') return confirmPage(url);
@@ -198,6 +205,15 @@ async function confirm(request: Request, env: Env): Promise<Response> {
 }
 
 // ---------------------------------------------------------------- helpers
+const REQUIRED_SECRETS = ['TURNSTILE_SECRET', 'RESEND_SEND_KEY', 'RESEND_CONTACTS_KEY', 'SIGNING_KEY', 'RESEND_SEGMENT_ID'] as const;
+
+/** Names (never values) of required secrets or bindings that are empty or absent. */
+function missingConfig(env: Env): string[] {
+  const out: string[] = REQUIRED_SECRETS.filter((k) => !String((env as unknown as Record<string, unknown>)[k] ?? '').trim());
+  if (!env.CONSENT_DB) out.push('CONSENT_DB');
+  return out;
+}
+
 function redirect(path: string): Response {
   return new Response(null, { status: 303, headers: { ...SECURITY_HEADERS, Location: path } });
 }
