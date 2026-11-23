@@ -10,7 +10,7 @@
     "broadcast": "node scripts/create-broadcast.mjs"
   },
   "dependencies": {
-    "astro": "^7.4.11"
+    "astro": "^7.4.13"
   },
   "devDependencies": {
     "wrangler": "^4.161.0"
